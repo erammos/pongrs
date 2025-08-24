@@ -126,10 +126,12 @@ fn main() -> Result<(), Error> {
                     return;
                 }
             }
-            if input.key_pressed(KeyCode::KeyA) {
+            if input.key_held(KeyCode::ArrowLeft) {
                 world.p1.velocity = -2;
-            } else if input.key_pressed(KeyCode::KeyD) {
+            } else if input.key_held(KeyCode::ArrowRight) {
                 world.p1.velocity = 2;
+            } else {
+                world.p1.velocity = 0;
             }
             // Update internal state and request a redraw
             world.update();
@@ -184,7 +186,6 @@ impl World {
         }
     }
 
-    /// Update the `World` internal state; bounce the box around the screen.
     fn update(&mut self) {
         if self.p1.rect.x <= 0 || self.p1.rect.x + PLAYER_WIDTH > WIDTH as i32 {
             self.p1.velocity *= -1;
@@ -227,7 +228,6 @@ impl World {
         }
         self.ball.velocity = ball_v;
     }
-
     fn draw_rect(&self, frame: &mut [u8], rect: Rect, color: [u8; 4]) {
         for i in rect.y..rect.y + rect.height {
             if i >= HEIGHT as i32 || i < 0 {
@@ -245,14 +245,11 @@ impl World {
         }
     }
 
-    /// Draw the `World` state to the frame buffer.
-    ///
-    /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8]) {
-        frame.fill(0xff);
-        self.draw_rect(frame, self.p1.rect, [0xff, 0, 1, 255]);
-        self.draw_rect(frame, self.p2.rect, [0xff, 0, 1, 255]);
-        self.draw_rect(frame, self.ball.rect, [0xff, 0, 1, 255]);
+        frame.fill(0x00);
+        self.draw_rect(frame, self.p1.rect, [0xff, 0, 0, 0xff]);
+        self.draw_rect(frame, self.p2.rect, [0x0, 0xff, 0, 0xff]);
+        self.draw_rect(frame, self.ball.rect, [0xff, 0xff, 0xff, 0xff]);
     }
 }
 
