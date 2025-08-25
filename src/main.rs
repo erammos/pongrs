@@ -1,9 +1,6 @@
 #![deny(clippy::all)]
 #![forbid(unsafe_code)]
 
-use std::default;
-use std::process::exit;
-
 use error_iter::ErrorIter as _;
 use log::error;
 use pixels::{Error, Pixels, SurfaceTexture};
@@ -23,7 +20,6 @@ const PLAYER_HEIGHT: i32 = 5;
 struct Vector {
     x: f32,
     y: f32,
-    w: f32,
 }
 
 impl Vector {
@@ -168,11 +164,7 @@ impl World {
                     width: 5,
                     height: 5,
                 },
-                velocity: Vector {
-                    x: 1.0,
-                    y: 1.0,
-                    ..Default::default()
-                },
+                velocity: Vector { x: 1.0, y: 1.0 },
             },
             p2: Player {
                 rect: Rect {
@@ -187,14 +179,13 @@ impl World {
     }
 
     fn update_player(p: &mut Player) {
-        let mut newp = p.rect.x + p.velocity;
+        let newp = p.rect.x + p.velocity;
         if newp > 0 && newp + p.rect.width < WIDTH as i32 {
             p.rect.x = newp;
         }
     }
 
     fn update(&mut self) {
-        let center_p2 = self.p2.rect.x + self.p2.rect.width / 2;
         if self.ball.velocity.x > 0.0 && self.p2.velocity < 0 {
             self.p2.velocity = 1;
         } else if self.ball.velocity.x < 0.0 && self.p2.velocity > 0 {
@@ -208,29 +199,13 @@ impl World {
         let mut ball_v = self.ball.velocity;
 
         if self.ball.rect.overlaps(self.p2.rect) {
-            ball_v = self.ball.velocity.reflection(Vector {
-                x: 0.0,
-                y: 1.0,
-                w: 0.0,
-            });
+            ball_v = self.ball.velocity.reflection(Vector { x: 0.0, y: 1.0 });
         } else if self.ball.rect.overlaps(self.p1.rect) {
-            ball_v = self.ball.velocity.reflection(Vector {
-                x: 0.0,
-                y: -1.0,
-                w: 0.0,
-            });
+            ball_v = self.ball.velocity.reflection(Vector { x: 0.0, y: -1.0 });
         } else if self.ball.rect.x <= 0 {
-            ball_v = self.ball.velocity.reflection(Vector {
-                x: 1.0,
-                y: 0.0,
-                w: 0.0,
-            });
+            ball_v = self.ball.velocity.reflection(Vector { x: 1.0, y: 0.0 });
         } else if self.ball.rect.x + self.ball.rect.width >= WIDTH as i32 {
-            ball_v = self.ball.velocity.reflection(Vector {
-                x: -1.0,
-                y: 0.0,
-                w: 0.0,
-            });
+            ball_v = self.ball.velocity.reflection(Vector { x: -1.0, y: 0.0 });
         }
         self.ball.velocity = ball_v;
     }
