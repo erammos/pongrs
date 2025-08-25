@@ -159,7 +159,7 @@ impl World {
                     width: PLAYER_WIDTH,
                     height: PLAYER_HEIGHT,
                 },
-                velocity: 2,
+                velocity: 0,
             },
             ball: Ball {
                 rect: Rect {
@@ -181,24 +181,30 @@ impl World {
                     width: PLAYER_WIDTH,
                     height: PLAYER_HEIGHT,
                 },
-                velocity: -2,
+                velocity: 2,
             },
         }
     }
 
+    fn update_player(p: &mut Player) {
+        let mut newp = p.rect.x + p.velocity;
+        if newp > 0 && newp + p.rect.width < WIDTH as i32 {
+            p.rect.x = newp;
+        }
+    }
+
     fn update(&mut self) {
-        if self.p1.rect.x <= 0 || self.p1.rect.x + PLAYER_WIDTH > WIDTH as i32 {
-            self.p1.velocity *= -1;
+        let center_p2 = self.p2.rect.x + self.p2.rect.width / 2;
+        if self.ball.velocity.x > 0.0 && self.p2.velocity < 0 {
+            self.p2.velocity = 1;
+        } else if self.ball.velocity.x < 0.0 && self.p2.velocity > 0 {
+            self.p2.velocity = -1;
         }
-        if self.p2.rect.x <= 0 || self.p2.rect.x + PLAYER_WIDTH > WIDTH as i32 {
-            self.p2.velocity *= -1;
-        }
-
-        self.p1.rect.x += self.p1.velocity;
-        self.p2.rect.x += self.p2.velocity;
-
+        World::update_player(&mut self.p2);
+        World::update_player(&mut self.p1);
         self.ball.rect.x += self.ball.velocity.x.round() as i32;
         self.ball.rect.y += self.ball.velocity.y.round() as i32;
+
         let mut ball_v = self.ball.velocity;
 
         if self.ball.rect.overlaps(self.p2.rect) {
