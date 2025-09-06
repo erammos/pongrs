@@ -202,6 +202,12 @@ impl World {
             ball_v = self.ball.velocity.reflection(Vector { x: 0.0, y: 1.0 });
         } else if self.ball.rect.overlaps(self.p1.rect) {
             ball_v = self.ball.velocity.reflection(Vector { x: 0.0, y: -1.0 });
+        } else if self.ball.rect.y <= 0 {
+            // Top wall
+            ball_v = self.ball.velocity.reflection(Vector { x: 0.0, y: 1.0 });
+        } else if self.ball.rect.y + self.ball.rect.height >= HEIGHT as i32 {
+            // Bottom wall
+            ball_v = self.ball.velocity.reflection(Vector { x: 0.0, y: -1.0 });
         } else if self.ball.rect.x <= 0 {
             ball_v = self.ball.velocity.reflection(Vector { x: 1.0, y: 0.0 });
         } else if self.ball.rect.x + self.ball.rect.width >= WIDTH as i32 {
@@ -237,5 +243,33 @@ impl World {
 impl Default for World {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ball_bounces_off_top_and_bottom_walls() {
+        // Test top wall collision
+        let mut world = World::new();
+        world.ball.rect.y = 0;
+        world.ball.velocity.y = -1.0;
+
+        world.update();
+
+        // The ball should bounce off the top wall, so its y-velocity should be positive
+        assert!(world.ball.velocity.y > 0.0);
+
+        // Test bottom wall collision
+        let mut world = World::new();
+        world.ball.rect.y = HEIGHT as i32 - world.ball.rect.height;
+        world.ball.velocity.y = 1.0;
+
+        world.update();
+
+        // The ball should bounce off the bottom wall, so its y-velocity should be negative
+        assert!(world.ball.velocity.y < 0.0);
     }
 }
